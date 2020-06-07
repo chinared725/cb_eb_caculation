@@ -1,100 +1,23 @@
-import json
-import requests
 import csv
-import re
 from lxml import etree
 import pandas as pd
 import numpy as np
-import pymysql
 import sys
 from sqlalchemy import create_engine
 import datetime
+
+from open_url_get_data import *
+from jisilu_utils import *
 
 
 pd.set_option('display.max_columns', 100)
 
 url = "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
 
-def get_data(url):
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36",
-    }
-
-    try:
-        response = requests.get(url, headers=headers)
-    except:
-        print('Connect url fail')
-    data = response.content.decode('utf-8')
-    data = json.loads(data)
-    data = data['rows']
-    ls_data = []
-    for row in  data:
-        ls_data.append(row['cell'])
-
-    return pd.DataFrame(ls_data)
-
-def remove_per (str):
-    str = str[:-1]
-    return str
-
-def data_process(data, columns):
-    for col in columns:
-        data[col+'1'] = data[col].apply(remove_per).convert_objects(convert_numeric=True) * 0.01
-    return data.convert_objects(convert_numeric=True)
-
-def get_name_part(str):
-    str = str[-2:]
-    return str
-
-def get_bond_time(str):
-
-    if str != '待上市':
-        str = str[-8:]
-    return str
-
-
-def mysql_conn(db_name):  # 为了方便数据库连接的函数
-    try:
-        db = pymysql.connect('localhost', 'root', 'china12345', db_name, charset='utf8')
-        print("connect mysql server success")
-        return db
-    except:
-        db.rollback()
-        print('could not connect to mysql server')
-
-
-
-
-def execute_sql_no_return(sql, db):  # 进行无返回的数据库操作的函数，比如create table
-    cursor = db.cursor()
-    try:
-        cursor.execute(sql)
-        db.commit()
-        print('execute sql success')
-    except:
-        db.rollback()
-        print('execute sql fail')
-
-
-def execute_sql_with_return(sql, db):  # 进行有返回的数据库操作的函数，比如select
-    cursor = db.cursor()
-    try:
-        cursor.execute(sql)
-        db.commit()
-        print('execute sql success')
-        return cursor.fetchall()
-    except:
-        db.rollback()
-        print('execute sql fail')
-
-
 data = get_data(url)
 data = data_process(data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
 data['turnover_rate'] = data.turnover_rt * 0.01
 data['报价时间'] = data['price_tips'].apply(get_bond_time)
-
-
-
 
 data.drop(['adjust_tip', 'adjusted', 'apply_cd', 'fund_rt', 'last_time', 'left_put_year', 'margin_flg', 'noted', 'online_offline_ratio', 'option_tip', 'owned',\
            'pre_bond_id', 'put_notes', 'qflag', 'qflag2', 'qstatus', 'real_force_redeem_price', 'ref_yield_info', 'repo_cd', 'sqflg', 'stock_cd', 'stock_net_value','convert_amt_ratio', \
@@ -110,9 +33,6 @@ cols = {'adj_cnt':'下调次数', 'adj_scnt':'下调成功次数', 'convert_cd':
         'increase_rt1':'转债涨幅','price_tips':'上市状态'}
 
 data.rename(columns=cols, inplace=True)
-
-
-
 
 '''
 try:
@@ -131,10 +51,8 @@ eb =  data[data['转债名称'].apply(get_name_part) == 'EB']
 cb_price_ascending = cb[['转债代码', '转债名称', '转债价格','正股现价','转股价','转股价值','溢价率','转债涨幅','正股涨幅','评级','剩余年限','当前规模_亿','原始规模_亿','双低',\
                    '正股名字','正股现价','pb','换手率','上市状态']].sort_values(by=['转债价格', '溢价率'])
 
-cb_double_low= cb_price_ascending[(cb_price_ascending['转债价格']<105)  & (cb_price_ascending['溢价率']<0.5\
+cb_double_low= cb_price_ascending[(cb_price_ascending['转债价格']<105)  & (cb_price_ascending['溢价率']<0.3\
 
                                                                        ) & (cb_price_ascending['上市状态']!='待上市')]
-
-
 
 print(cb_double_low)
