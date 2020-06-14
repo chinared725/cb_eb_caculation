@@ -14,8 +14,6 @@ data = data_process(data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'y
 data['turnover_rate'] = data.turnover_rt * 0.01
 data['报价时间'] = data['price_tips'].apply(get_bond_time)
 
-print(data[data['bond_nm']=='岭南转债'])
-
 data.drop(['adjust_tip', 'adjusted', 'apply_cd', 'fund_rt', 'last_time', 'left_put_year', 'margin_flg', 'noted', 'online_offline_ratio', 'option_tip', 'owned',\
            'pre_bond_id', 'put_notes', 'qflag', 'qflag2', 'qstatus', 'real_force_redeem_price', 'ref_yield_info', 'repo_cd', 'sqflg', 'stock_cd', 'stock_net_value','convert_amt_ratio', \
            'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax','price','put_dt','put_inc_cpn_fl','put_total_days', 'rating_cd','ration', 'redeem_dt', 'redeem_inc_cpn_fl',\
@@ -36,11 +34,14 @@ eb =  data[data['转债名称'].apply(get_name_part) == 'EB']
 
 
 cb_price_ascending = cb[['转债代码', '转债名称', '转债价格','正股现价','转股价','转股价值','溢价率','转债涨幅','正股涨幅','评级','剩余年限','当前规模_亿','原始规模_亿','双低',\
-                   '正股名字','正股现价','pb','换手率','上市状态']].sort_values(by=['转债价格', '溢价率'])
+                   '正股名字','正股现价','pb','换手率','上市状态','下调次数','下调成功次数']].sort_values(by=['转债价格', '溢价率'])
 
-cb_double_low= cb_price_ascending[(cb_price_ascending['转债价格']<105)  & (cb_price_ascending['溢价率']<0.3) \
+cb_double_low= cb_price_ascending[(cb_price_ascending['转债价格']<106)  & (cb_price_ascending['溢价率']<0.3) \
                                             & (cb_price_ascending['上市状态']!='待上市')]
 
-cb_adjusted = cb[(cb['下调次数']>=1) & (cb['转债价格'] < 105) & (cb['溢价率']<0.35)].sort_values(by=['转债价格', '溢价率'])
+cb_adjusted = cb_price_ascending[(cb_price_ascending['下调次数']>=1) & (cb_price_ascending['转债价格'] < 105) & (cb_price_ascending['溢价率']<0.35)].sort_values(by=['转债价格', '溢价率'])
 
-#print(cb_adjusted)
+print('\n可转债熟女+双低----------------------\n')
+print(cb_adjusted)
+print('\n双低----------------------\n\n')
+print(cb_double_low)
