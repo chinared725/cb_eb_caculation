@@ -4,7 +4,7 @@ import requests
 import pandas as pd
 import numpy as np
 
-def get_data(url):
+def get_data(url):        #get dataframe of all CB&EB data
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/51.0.2704.103 Safari/537.36",
     }

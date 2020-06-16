@@ -3,17 +3,17 @@ import pandas as pd
 import numpy as np
 
 
-def data_remove_percent(data, columns): #
+def data_remove_percent(data, columns):  #remove '%' symble in columne
     for col in columns:
         data[col] = data[col].apply(lambda x : x[:-1])
         data[col] = data[col].apply(pd.to_numeric, errors = 'ignore')*0.01
     return data.apply(pd.to_numeric, errors = 'ignore')
 
-def get_name_part(str):
+def get_name_part(str):     #function to find if the bond is EB or CB
     str = str[-2:]
     return str
 
-def get_bond_time(str):
+def get_bond_time(str):    #function to get the bond quote time
 
     if str != '待上市':
         str = str[-8:]

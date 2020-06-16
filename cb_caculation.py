@@ -1,6 +1,7 @@
 import csv
 import pandas as pd
 import numpy as np
+import xlrd
 from open_url_get_data import *
 from jisilu_utils import *
 
@@ -10,7 +11,7 @@ url = "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
 data = get_data(url)
 
 data = data_remove_percent(data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
-data['turnover_rate'] = data.turnover_rt * 0.01
+data['turnover_rate'] = data['turnover_rt'] * 0.01
 data['报价时间'] = data['price_tips'].apply(get_bond_time)
 
 data.drop(['adjust_tip',
@@ -127,18 +128,20 @@ cb_price_ascending = cb[['转债代码',
                          '换手率',
                          '上市状态',
                          '下调次数',
-                         '下调成功次数']].sort_values(by=['转债价格', '溢价率'])
+                         '下调成功次数']].sort_values(by=['转债价格', '溢价率'])   #sort the dataframe by price and premium rate
+
 
 cb_double_low= cb_price_ascending[(cb_price_ascending['转债价格']<105)  & (cb_price_ascending['溢价率']<0.3) \
-                                            & (cb_price_ascending['上市状态']!='待上市') & (cb_price_ascending['pb'] > 1)]
+ & (cb_price_ascending['上市状态']!='待上市') & (cb_price_ascending['pb'] > 1)]    # find cb with price lower than 105, premium rate <0.3 and pb>1
 
 cb_adjusted = cb_price_ascending[(cb_price_ascending['下调次数']>=1) & (cb_price_ascending['转债价格'] < 105) \
- & (cb_price_ascending['溢价率']<0.3)  & (cb_price_ascending['pb'] > 1)].sort_values(by=['转债价格', '溢价率'])
+ & (cb_price_ascending['溢价率']<0.3)  & (cb_price_ascending['pb'] > 1)].sort_values(by=['转债价格', '溢价率'])  # find cb with price lower than 105, premium rate <0.3 and pb>1 and ajust for at lease one time
 
 
-
-print('\n双低----------------------\n\n')
+print('\n双低可转债，价格 < 105元，溢价率 < 30%, 已上市，正股PB > 1----------------------\n\n')
 print(cb_double_low)
+cb_double_low.to_excel('double_low_cb.xls', index=False)
 
-print('\n可转债熟女+双低----------------------\n')
+print('\n可转债熟女+双低，价格 < 105元，溢价率 < 30%, 已上市，正股PB > 1----------------------\n')
 print(cb_adjusted)
+cb_adjusted.to_excel('ajusted_double_low_cb.xls',index=False)
