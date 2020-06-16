@@ -7,9 +7,9 @@ from jisilu_utils import *
 pd.set_option('display.max_columns', 100)
 
 url = "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
-
 data = get_data(url)
-data = data_process(data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
+
+data = data_remove_percent(data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
 data['turnover_rate'] = data.turnover_rt * 0.01
 data['报价时间'] = data['price_tips'].apply(get_bond_time)
 

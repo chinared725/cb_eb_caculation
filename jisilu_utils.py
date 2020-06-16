@@ -2,13 +2,10 @@
 import pandas as pd
 import numpy as np
 
-def remove_per (str):           #remove '%' in data
-    str = str[:-1]
-    return str
 
-def data_process(data, columns): #
+def data_remove_percent(data, columns): #
     for col in columns:
-        data[col] = data[col].apply(remove_per)
+        data[col] = data[col].apply(lambda x : x[:-1])
         data[col] = data[col].apply(pd.to_numeric, errors = 'ignore')*0.01
     return data.apply(pd.to_numeric, errors = 'ignore')
 
