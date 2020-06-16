@@ -1,12 +1,16 @@
 
+import pandas as pd
+import numpy as np
+
 def remove_per (str):           #remove '%' in data
     str = str[:-1]
     return str
 
 def data_process(data, columns): #
     for col in columns:
-        data[col+'1'] = data[col].apply(remove_per).convert_objects(convert_numeric=True) * 0.01
-    return data.convert_objects(convert_numeric=True)
+        data[col] = data[col].apply(remove_per)
+        data[col] = data[col].apply(pd.to_numeric, errors = 'ignore')*0.01
+    return data.apply(pd.to_numeric, errors = 'ignore')
 
 def get_name_part(str):
     str = str[-2:]
