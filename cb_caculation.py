@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import xlrd
 from open_url_get_data import *
-from jisilu_utils import *
+from utils import *
 
 pd.set_option('display.max_columns', 100)
 
@@ -138,10 +138,11 @@ cb_adjusted = cb_price_ascending[(cb_price_ascending['下调次数']>=1) & (cb_p
  & (cb_price_ascending['溢价率']<0.3)  & (cb_price_ascending['pb'] > 1)].sort_values(by=['转债价格', '溢价率'])  # find cb with price lower than 105, premium rate <0.3 and pb>1 and ajust for at lease one time
 
 
-print('\n双低可转债，价格 < 105元，溢价率 < 30%, 已上市，正股PB > 1----------------------\n\n')
+print('\n--------------------双低可转债，价格 < 105元，溢价率 < 30%, 已上市，正股PB > 1----------------------\n\n')
 print(cb_double_low)
 cb_double_low.to_excel('double_low_cb.xls', index=False)
 
-print('\n可转债熟女+双低，价格 < 105元，溢价率 < 30%, 已上市，正股PB > 1----------------------\n')
+print('-------------------------------------------------------------------------------------------------------')
+print('\n  ------------------可转债熟女+双低，价格 < 105元，溢价率 < 30%, 已上市，正股PB > 1------------------\n\n')
 print(cb_adjusted)
 cb_adjusted.to_excel('ajusted_double_low_cb.xls',index=False)
