@@ -106,8 +106,8 @@ class CbEb:
 
         data.rename(columns=cols, inplace=True)
 
-        cb = data[data['转债名称'].apply(get_name_part) != 'EB']
-        eb =  data[data['转债名称'].apply(get_name_part) == 'EB']
+        cb = data[data['转债名称'].apply(lambda x : 'EB' not in x)]
+
 
 
         cb = cb[['转债代码',
@@ -228,7 +228,7 @@ class CbEb:
 
         data.rename(columns=cols, inplace=True)
 
-        eb =  data[data['转债名称'].apply(get_name_part) == 'EB']
+        eb =  data[data['转债名称'].apply(lambda x : 'EB' in x)]
 
         eb = eb[['转债代码',
                  '转债名称',
@@ -254,9 +254,9 @@ class CbEb:
         return eb
 
     def get_double_low_bond(self, bond_type='cb', bond_price=105, premium_rate=0.3, status=True, pb=0, adjusted = False):
-        if bond_type == 'cb':
+        if bond_type.lower() == 'cb':
             data = self.get_cb_data()
-        elif bond_type == 'eb':
+        elif bond_type.lower() == 'eb':
             data = self.get_eb_data()
         else:
             raise ValueError('错误的债券类型')
