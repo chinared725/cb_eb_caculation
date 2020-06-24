@@ -253,7 +253,7 @@ class CbEb:
                  '下调成功次数']].sort_values(by=['转债价格', '溢价率'])   #sort the dataframe by price and premium rate
         return eb
 
-    def get_double_low_bond(self, bond_type='cb', bond_price=105, premium_rate=0.3, status=True, pb=0, adjusted = False):
+    def get_double_low_bond(self, bond_type='cb', bond_price=105, premium_rate=0.3,pb=0, adjusted = False):
         if bond_type.lower() == 'cb':
             data = self.get_cb_data()
         elif bond_type.lower() == 'eb':
@@ -261,11 +261,20 @@ class CbEb:
         else:
             raise ValueError('错误的债券类型')
 
-        cb_double_low = data[(data['转债价格'] < bond_price)  & (data['溢价率'] < premium_rate) \
+        double_low = data[(data['转债价格'] < bond_price)  & (data['溢价率'] < premium_rate) \
          & (data['上市状态']!='待上市') & (data['pb'] > pb)]    # find cb with price lower than 105, premium rate <0.3 and pb>1
 
         if adjusted:
-            cb_double_low = data[(data['下调次数']>=1) & (data['转债价格'] < bond_price) \
+            double_low = data[(data['下调次数']>=1) & (data['转债价格'] < bond_price) \
              & (data['溢价率']<premium_rate)  & (data['pb'] > pb)].sort_values(by=['转债价格', '溢价率'])  # find cb with price lower than 105, premium rate <0.3 and pb>1 and ajust for at lease one time
+        return double_low
 
-        return cb_double_low
+    def get_bond_not_list(self, bond_type='cb'):
+        if bond_type.lower() == 'cb':
+            data = self.get_cb_data()
+        elif bond_type.lower() == 'eb':
+            data = self.get_eb_data()
+        else:
+            raise ValueError('错误的债券类型')
+        bond_not_list = data[data['上市状态']=='待上市'].sort_values(by=['转股价值'])
+        return bond_not_list
