@@ -15,3 +15,7 @@ def get_bond_time(str):    #function to get the bond quote time
     if str != '待上市':
         str = str[-8:]
     return str
+
+def rate_add_percent(serie):
+    serie = serie.map(lambda x : format(x, '0.1%'))
+    return serie
