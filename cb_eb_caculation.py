@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 pd.set_option('display.max_columns',100)
 
-bond_type = 'cb'
+bond_type = 'eb'
 bond_price = 107
 premium_rate = 0.3
 pb = 1
@@ -20,4 +20,4 @@ if __name__ == '__main__':
 
     print('-------------------------------------------------------------------------------------------------------')
     print('\n待上市可转债-----------------------------------------------------------------\n\n')
-    print(CbEb().get_bond_not_list())
+    print(CbEb().get_bond_not_list(bond_type=bond_type))

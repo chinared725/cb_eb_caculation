@@ -144,7 +144,7 @@ class CbEb:
         if bond_type.lower() == 'cb':
             data = self.get_bond_data(bond_type = 'cb')
         elif bond_type.lower() == 'eb':
-            data = self.get_eb_data(bond_type = 'eb')
+            data = self.get_bond_data(bond_type = 'eb')
         else:
             raise ValueError('错误的债券类型')
 
