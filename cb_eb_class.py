@@ -7,7 +7,9 @@ from utils import *
 class CbEb:
 
     def __init__(self):
-        self.url = "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
+        #self.url = "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
+        #self.url = 'https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1593047862790'
+        self.url = 'https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1593047852448'
         self.data = get_data(self.url)
 
     def get_bond_data(self, bond_type='cb'):
@@ -15,6 +17,8 @@ class CbEb:
         data = data_remove_percent(self.data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
         data['turnover_rate'] = data['turnover_rt'] * 0.01
         data['报价时间'] = data['price_tips'].apply(get_bond_time)
+
+        print(data.head(5))
 
         data.drop(['adjust_tip',
                    'adjusted',
@@ -27,7 +31,7 @@ class CbEb:
                    'online_offline_ratio',
                    'option_tip',
                    'owned',
-                   'pre_bond_id',
+                   'bond_id',
                    'put_notes',
                    'qflag',
                    'qflag2',
@@ -100,12 +104,13 @@ class CbEb:
                 'sincrease_rt':'正股涨幅',
                 'ytm_rt':'年化税前收益率',
                 'ytm_rt_tax':'年化税后收益率',
-                'bond_id':'转债代码',
+                'pre_bond_id':'转债代码',
                 'bond_nm':'转债名称',
                 'increase_rt':'转债涨幅',
                 'price_tips':'上市状态'}
 
         data.rename(columns=cols, inplace=True)
+
         cols = ['转债代码',
                  '转债名称',
                  '正股名字',

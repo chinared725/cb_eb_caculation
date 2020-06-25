@@ -3,9 +3,9 @@ import pandas as pd
 import numpy as np
 pd.set_option('display.max_columns',100)
 
-bond_type = 'eb'
-bond_price = 107
-premium_rate = 0.3
+bond_type = 'cb'
+bond_price = 115
+premium_rate = 0.1
 pb = 1
 
 if __name__ == '__main__':
