@@ -7,9 +7,9 @@ from utils import *
 class CbEb:
 
     def __init__(self):
-        #self.url = "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
+        self.url = "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
         #self.url = 'https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1593047862790'
-        self.url = 'https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1593047852448'
+        #self.url = 'https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1593047852448'
         self.data = get_data(self.url)
 
     def get_bond_data(self, bond_type='cb'):
@@ -17,8 +17,6 @@ class CbEb:
         data = data_remove_percent(self.data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
         data['turnover_rate'] = data['turnover_rt'] * 0.01
         data['报价时间'] = data['price_tips'].apply(get_bond_time)
-
-        print(data.head(5))
 
         data.drop(['adjust_tip',
                    'adjusted',
@@ -137,7 +135,7 @@ class CbEb:
             cb = data[data['转债名称'].apply(lambda x : 'EB' not in x)].copy()
             bond = cb.sort_values(by=['转债价格', '溢价率'])   #sort the dataframe by price and premium rate
         elif bond_type.lower() == 'eb':
-            eb =  data[data['转债名称'].apply(lambda x : 'EB' in x)]
+            eb =  data[data['转债名称'].apply(lambda x : 'EB' in x)].copy()
             bond = eb.sort_values(by=['转债价格', '溢价率'])   #sort the dataframe by price and premium rate
         else:
             raise ValueError('错误的债券类型')
@@ -185,3 +183,11 @@ class CbEb:
         bond_not_list = bond_not_list[cols]
         bond_not_list['溢价率'] = bond_not_list['溢价率'].apply(pd.to_numeric, errors='ignore').map(lambda x : format(x, '0.1%'))
         return bond_not_list
+
+    def get_bond_data_by_name(self, bond_name_list,bond_type='cb'):
+        if bond_type.lower() != 'cb' and bond_type.lower() != 'eb':
+            raise ValueError('错误的债券类型')
+        else:
+            bond = self.get_bond_data(bond_type)
+            bond = bond[bond['转债名称'].isin(bond_name_list)]
+        return bond
