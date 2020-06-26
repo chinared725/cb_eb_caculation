@@ -132,13 +132,14 @@ class CbEb:
                  '上市状态',
                  '下调次数',
                  '下调成功次数',
-                 '年化税后收益率']
+                 '年化税后收益率',
+                 '年化税前收益率']
         data = data[cols]
 
         company_bond_return_curve = get_curve()  #导入企业债收益率曲线
         #通过企业债收益曲线，根据评级、年限来计算债券的收益率
         data['债券收益率'] = data.apply(lambda x : scipy.interpolate.interp1d(company_bond_return_curve[x['评级']][0],company_bond_return_curve[x['评级']][1])(x['剩余年限']),axis=1)*0.01
-        data['纯债价值'] = data.apply(lambda x : (x['转债价格']*(1+x['年化税后收益率'])**x['剩余年限'])/((1 + x['债券收益率'])**x['剩余年限']), axis=1)
+        data['纯债价值'] = data.apply(lambda x : (x['转债价格']*(1+x['年化税前收益率'])**x['剩余年限'])/((1 + x['债券收益率'])**x['剩余年限']), axis=1)
 
         if bond_type.lower() == 'cb':
             cb = data[data['转债名称'].apply(lambda x : 'EB' not in x)].copy()
