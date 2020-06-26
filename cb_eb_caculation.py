@@ -1,6 +1,10 @@
 from cb_eb_class import CbEb
 import pandas as pd
 import numpy as np
+
+
+
+
 pd.set_option('display.max_columns',100)
 
 bond_type = 'cb'
@@ -28,5 +32,5 @@ if __name__ == '__main__':
     bond = CbEb().get_bond_data_by_name(bond_names)
     print(bond)
     '''
-    bond = CbEb().data
+    bond = CbEb().get_bond_data()
     print(bond)

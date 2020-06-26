@@ -3,6 +3,9 @@ import pandas as pd
 import numpy as np
 from open_url_get_data import *
 from utils import *
+import scipy.interpolate
+
+from bond_curve import get_curve
 
 class CbEb:
 
@@ -44,7 +47,7 @@ class CbEb:
                    'put_dt',
                    'put_inc_cpn_fl',
                    'put_total_days',
-                   'rating_cd',
+                   'issuer_rating_cd',
                    'ration',
                    'redeem_dt',
                    'redeem_inc_cpn_fl',
@@ -69,7 +72,7 @@ class CbEb:
                 'force_redeem_price':'强赎股价',
                 'full_price':'转债价格',
                 'guarantor':'担保',
-                'issuer_rating_cd':'评级',
+                'rating_cd':'评级',
                 'maturity_dt':'到期日',
                 'next_put_dt':'回售日',
                 'orig_iss_amt':'原始规模_亿',
@@ -128,8 +131,14 @@ class CbEb:
                  '换手率',
                  '上市状态',
                  '下调次数',
-                 '下调成功次数']
+                 '下调成功次数',
+                 '年化税后收益率']
         data = data[cols]
+
+        company_bond_return_curve = get_curve()  #导入企业债收益率曲线
+        #通过企业债收益曲线，根据评级、年限来计算债券的收益率
+        data['债券收益率'] = data.apply(lambda x : scipy.interpolate.interp1d(company_bond_return_curve[x['评级']][0],company_bond_return_curve[x['评级']][1])(x['剩余年限']),axis=1)*0.01
+        data['纯债价值'] = data.apply(lambda x : (x['转债价格']*(1+x['年化税后收益率'])**x['剩余年限'])/((1 + x['债券收益率'])**x['剩余年限']), axis=1)
 
         if bond_type.lower() == 'cb':
             cb = data[data['转债名称'].apply(lambda x : 'EB' not in x)].copy()

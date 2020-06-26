@@ -13,21 +13,20 @@ pd.set_option('display.max_columns', 100)
 #url = 'http://yield.chinabond.com.cn/cbweb-mn/yc/searchYc?workTimes=2020-06-24&&xyzSelect=txy&&dxbj=0&&qxll=0,&&yqqxN=N&&yqqxK=4&&ycDefIds=2c9081e50a2f9606010a309f4af50111,8a8b2ca045e879bf014607ebef677f8e,2c908188138b62cd01139a2ee6b51e25,2c90818812b319130112c279222836c3,8a8b2ca045e879bf014607f9982c7fc0,2c9081e91b55cc84011be40946ca0925,2c9081e91e6a3313011e6d438a58000d,8a8b2ca04142df6a014148ca880f3046,2c9081e91ea160e5011eab1f116c1a59,&&wrjxCBFlag=0&&locale=zh_CN'
 
 
-ycDefIds = ['2c9081e50a2f9606010a309f4af50111',
-             '8a8b2ca045e879bf014607ebef677f8e',
-             '2c908188138b62cd01139a2ee6b51e25',
-             '2c90818812b319130112c279222836c3',
-             '8a8b2ca045e879bf014607f9982c7fc0',
-             '2c9081e91b55cc84011be40946ca0925',
-             '2c9081e91e6a3313011e6d438a58000d',
-             '8a8b2ca04142df6a014148ca880f3046',
-             '2c9081e91ea160e5011eab1f116c1a59',
-             '8a8b2ca0455847ac0145650780ad68fb',
-             '8a8b2ca0455847ac0145650ba23b68ff']
+def get_url(workTimes):
+    ycDefIds = ['2c9081e50a2f9606010a309f4af50111',
+                 '8a8b2ca045e879bf014607ebef677f8e',
+                 '2c908188138b62cd01139a2ee6b51e25',
+                 '2c90818812b319130112c279222836c3',
+                 '8a8b2ca045e879bf014607f9982c7fc0',
+                 '2c9081e91b55cc84011be40946ca0925',
+                 '2c9081e91e6a3313011e6d438a58000d',
+                 '8a8b2ca04142df6a014148ca880f3046',
+                 '2c9081e91ea160e5011eab1f116c1a59',
+                 '8a8b2ca0455847ac0145650780ad68fb',
+                 '8a8b2ca0455847ac0145650ba23b68ff']
 
-base_url = 'http://yield.chinabond.com.cn/cbweb-mn/yc/searchYc?'
-
-def get_url(ycDefIds, base_url,workTimes):
+    base_url = 'http://yield.chinabond.com.cn/cbweb-mn/yc/searchYc?'
     ycDefIds_value = ''
     for item in ycDefIds:
         ycDefIds_value = ycDefIds_value + item + ','
@@ -42,7 +41,7 @@ def get_url(ycDefIds, base_url,workTimes):
     return url
 
 
-def get_curv(ycDefIds, base_url):
+def get_curve():
     headers = {
         'Host': 'yield.chinabond.com.cn',
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36',
@@ -50,7 +49,7 @@ def get_curv(ycDefIds, base_url):
         'X-Requested-With' : 'XMLHttpRequest',}
     for n_day in range(365):
         workTimes = ('workTimes',str((datetime.datetime.now()-datetime.timedelta(days=n_day)).strftime('%Y-%m-%d')))
-        url = get_url(ycDefIds, base_url, workTimes)
+        url = get_url(workTimes)
         response = requests.post(url=url,headers=headers)
         data = response.text
         if data:
@@ -81,9 +80,3 @@ def get_curv(ycDefIds, base_url):
         key = temp if (temp[-1] != '＋') else (temp[:-1] + '+')
         ret_data[key] = [X, Y]
     return ret_data
-
-
-data = get_curv(ycDefIds, base_url)
-
-for key, values in data.items():
-    print(key)
