@@ -4,6 +4,9 @@ import pandas as pd
 import datetime
 import time
 import re
+import scipy
+import numpy as np
+
 
 pd.set_option('display.max_columns', 100)
 
@@ -53,13 +56,12 @@ def get_curv(ycDefIds, base_url):
         if data:
             data = json.loads(data)
             break
-        time.sleep(10)
     #data = pd.DataFrame(data)
     pattern = re.compile(r'\((.*?)\)')
     #data['评级'] = data['ycDefName'].map(lambda x : pattern.search(x).group(1).strip())
     ret_data = {}
 
-    ''' @一种数据结构 {'AA': [[x,y]]}
+    ''' @一种数据结构 {'AA': [[x,y]]}, 注意AA+为'AA＋'
         for item in data:
         num_valid = []
         for num_list in item['seriesData']:
@@ -75,9 +77,13 @@ def get_curv(ycDefIds, base_url):
             if str(num_list[1]).strip() != 'None':
                 X.append(num_list[0])
                 Y.append(num_list[1])
-        ret_data[pattern.search(item['ycDefName']).group(1)] = [X, Y]
-
+        temp = pattern.search(item['ycDefName']).group(1)
+        key = temp if (temp[-1] != '＋') else (temp[:-1] + '+')
+        ret_data[key] = [X, Y]
     return ret_data
 
+
 data = get_curv(ycDefIds, base_url)
-print(data)
+
+for key, values in data.items():
+    print(key)
