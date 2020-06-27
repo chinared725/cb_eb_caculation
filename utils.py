@@ -17,5 +17,5 @@ def get_bond_time(str):    #function to get the bond quote time
     return str
 
 def rate_add_percent(serie):
-    serie = serie.map(lambda x : format(x, '0.1%'))
+    serie = serie.map(lambda x : format(x, '0.2%'))
     return serie

@@ -6,7 +6,8 @@ from utils import *
 import scipy.interpolate
 
 from bond_curve import get_curve
-
+from BS_option import get_bs_option_value
+from baostock_api import BS_Api
 
 '''
 @这个类用于取得债券的数据，网络爬虫集思录数据，链接出自以下几种地址，都可以
@@ -19,14 +20,18 @@ from bond_curve import get_curve
 class CbEb:
 
     def __init__(self):
-        self.url = "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
-        self.data = data_remove_percent(get_data(self.url), ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
+        self.data = get_data('https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900')
         self.company_bond_return_curve = get_curve()  #导入企业债收益率曲线
+        baostock_data = BS_Api()
+        self.data['正股波动率'] = self.data.apply(lambda x : np.std(baostock_data.get_daily_data(x['stock_id'])['pctChg']*0.01, ddof = 1)*(250**0.5),axis=1)
+        baostock_data.logout()
 
     def get_bond_data(self, bond_type='cb'):
         data = self.data.copy()
+        data = data_remove_percent(data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
         data['turnover_rate'] = data['turnover_rt'] * 0.01
         data['报价时间'] = data['price_tips'].apply(get_bond_time)
+
 
         data.drop(['adjust_tip',
                    'adjusted',
@@ -64,7 +69,7 @@ class CbEb:
                    'ration_cd',
                    'turnover_rt'], axis=1, inplace=True)
 
-        cols = {'adj_cnt':'下调次数',
+        cols_1 = {'adj_cnt':'下调次数',
                 'adj_scnt':'下调成功次数',
                 'convert_cd':'转债占比',
                 'convert_cd_tip':'转股提示',
@@ -110,18 +115,19 @@ class CbEb:
                 'convert_amt_ratio':'可转债_股票市值比',
                 'premium_rt':'溢价率',
                 'sincrease_rt':'正股涨幅',
-                'ytm_rt':'年化税前收益率',
-                'ytm_rt_tax':'年化税后收益率',
+                'ytm_rt':'税前收益率',
+                'ytm_rt_tax':'税后收益率',
                 'pre_bond_id':'转债代码',
                 'bond_nm':'转债名称',
                 'increase_rt':'转债涨幅',
                 'price_tips':'上市状态'}
 
-        data.rename(columns=cols, inplace=True)
+        data.rename(columns=cols_1, inplace=True)
 
-        cols = ['转债代码',
+        cols_2 = ['转债代码',
                  '转债名称',
                  '正股名字',
+                 '正股代码',
                  '正股现价',
                  '转股价',
                  '转债价格',
@@ -139,14 +145,21 @@ class CbEb:
                  '上市状态',
                  '下调次数',
                  '下调成功次数',
-                 '年化税后收益率',
-                 '年化税前收益率']
-        data = data[cols]
+                 '税后收益率',
+                 '税前收益率',
+                 '正股波动率']
+        data = data[cols_2]
 
 
         #通过企业债收益曲线，根据评级、年限来计算债券的收益率
         data['债券收益率'] = data.apply(lambda x : scipy.interpolate.interp1d(self.company_bond_return_curve[x['评级']][0],self.company_bond_return_curve[x['评级']][1])(x['剩余年限']),axis=1)
-        data['纯债价值'] = data.apply(lambda x : (x['转债价格']*(1+x['年化税前收益率'])**x['剩余年限'])/((1 + x['债券收益率'])**x['剩余年限']), axis=1)
+        data['纯债价值'] = data.apply(lambda x : (x['转债价格']*(1+x['税前收益率'])**x['剩余年限'])/((1 + x['债券收益率'])**x['剩余年限']), axis=1)
+        data['纯债价值比例'] = data.apply(lambda x : x['纯债价值']/x['转债价格'], axis=1)
+
+        data['期权价值'] = data.apply(lambda x : get_bs_option_value(x['正股现价'], x['转股价'], x['剩余年限'], \
+            scipy.interpolate.interp1d(self.company_bond_return_curve['国债即期'][0],self.company_bond_return_curve['国债即期'][1])(x['剩余年限']), \
+            x['正股波动率']),axis=1)
+        data['理论偏离度'] = data.apply(lambda x : (x['转债价格'] - (x['纯债价值'] + x['期权价值']))/(x['纯债价值'] + x['期权价值']), axis=1)
 
         if bond_type.lower() == 'cb':
             cb = data[data['转债名称'].apply(lambda x : 'EB' not in x)].copy()
@@ -175,7 +188,8 @@ class CbEb:
             double_low = data[(data['下调次数']>=1) & (data['转债价格'] < bond_price) & (data['溢价率']<premium_rate) \
              &  (data['上市状态']!='待上市') & (data['pb'] > pb)].sort_values(by=['转债价格', '溢价率']).copy()  # find cb with price lower than 105, premium rate <0.3 and pb>1 and ajust for at lease one time
 
-        double_low[['溢价率','正股涨幅', '转债涨幅']] = double_low[['溢价率','正股涨幅', '转债涨幅']].apply(rate_add_percent, axis=1)
+        double_low[['溢价率','正股涨幅', '转债涨幅','债券收益率','换手率','税前收益率','税后收益率','债券收益率','纯债价值比例','正股波动率','理论偏离度']] = \
+            double_low[['溢价率','正股涨幅', '转债涨幅','债券收益率','换手率','税前收益率','税后收益率','债券收益率','纯债价值比例','正股波动率','理论偏离度']].apply(rate_add_percent, axis=1)
         return double_low
 
 
@@ -207,4 +221,6 @@ class CbEb:
         else:
             bond = self.get_bond_data(bond_type)
             bond = bond[bond['转债名称'].isin(bond_name_list)]
+        bond[['溢价率','正股涨幅', '转债涨幅','债券收益率','换手率','税前收益率','税后收益率','债券收益率','纯债价值比例','正股波动率','理论偏离度']] = \
+            bond[['溢价率','正股涨幅', '转债涨幅','债券收益率','换手率','税前收益率','税后收益率','债券收益率','纯债价值比例','正股波动率','理论偏离度']].apply(rate_add_percent, axis=1)
         return bond

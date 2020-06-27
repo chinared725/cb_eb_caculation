@@ -8,7 +8,7 @@ import numpy as np
 pd.set_option('display.max_columns',100)
 
 bond_type = 'cb'
-bond_price = 105
+bond_price = 115
 premium_rate = 0.25
 pb = 1
 
@@ -28,6 +28,6 @@ if __name__ == '__main__':
 
     print('-------------------------------------------------------------------------------------------------------')
     print('\n你想了解的可转债可转债-----------------------------------------------------------------\n\n')
-    bond_names = ['长证转债','国君转债','浙商转债','华安转债']
-    bond = cb_eb.data
+    bond_names = ['长证转债','国君转债','浙商转债','华安转债','亚药转债']
+    bond = cb_eb.get_bond_data_by_name(bond_names)
     print(bond)
