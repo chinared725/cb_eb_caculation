@@ -12,5 +12,4 @@ def get_bs_option_value(stock_price, convert_price, year_left, rate, std):
     Nd2 = st.norm.cdf(d2)
     C = stock_price * Nd1 - convert_price * math.exp(rate_continue * -1 * year_left) * Nd2
     bs_option = (100 / convert_price) * C
-    print(bs_option)
     return bs_option

@@ -27,4 +27,5 @@ class BS_Api:
         return result
 
     def logout(self):
+        print('logout')
         bs.logout()
