@@ -8,9 +8,21 @@ import scipy
 import numpy as np
 
 
-pd.set_option('display.max_columns', 100)
 
-#url = 'http://yield.chinabond.com.cn/cbweb-mn/yc/searchYc?workTimes=2020-06-24&&xyzSelect=txy&&dxbj=0&&qxll=0,&&yqqxN=N&&yqqxK=4&&ycDefIds=2c9081e50a2f9606010a309f4af50111,8a8b2ca045e879bf014607ebef677f8e,2c908188138b62cd01139a2ee6b51e25,2c90818812b319130112c279222836c3,8a8b2ca045e879bf014607f9982c7fc0,2c9081e91b55cc84011be40946ca0925,2c9081e91e6a3313011e6d438a58000d,8a8b2ca04142df6a014148ca880f3046,2c9081e91ea160e5011eab1f116c1a59,&&wrjxCBFlag=0&&locale=zh_CN'
+
+'''
+@中债网站链接如下：
+url = 'http://yield.chinabond.com.cn/cbweb-mn/yc/searchYc?workTimes=2020-06-24&&xyzSelect=txy&&dxbj=0&&qxll=0,&&yqqxN=N&&yqqxK=4&&ycDefIds=2c9081e50a2f9606010a309f4af50111,8a8b2ca045e879bf014607ebef677f8e,2c908188138b62cd01139a2ee6b51e25,2c90818812b319130112c279222836c3,8a8b2ca045e879bf014607f9982c7fc0,2c9081e91b55cc84011be40946ca0925,2c9081e91e6a3313011e6d438a58000d,8a8b2ca04142df6a014148ca880f3046,2c9081e91ea160e5011eab1f116c1a59,&&wrjxCBFlag=0&&locale=zh_CN'
+@网站使用ajax技术，url里的参数如下：
+params = (('workTimes','2020-06-24)', ('xyzSelect', 'txy'), ('dxbj', '0'), ('qxll', '0,'), ('yqqxN', 'N'), ('yqqxK', '4'), ('ycDefIds','2c9081e50a2f9606010a309f4af50111'), ('wrjxCBFlag', '0'), ('locale', 'zh_CN'))
+
+@返回的数据结构如下
+ {'AA':[x,y]，'AA+':[x,y]},其中x是时间点，y是相应的企业债收益率，
+
+'''
+
+
+
 
 
 def get_url(workTimes):
@@ -55,27 +67,17 @@ def get_curve():
         if data:
             data = json.loads(data)
             break
-    #data = pd.DataFrame(data)
+
     pattern = re.compile(r'\((.*?)\)')
-    #data['评级'] = data['ycDefName'].map(lambda x : pattern.search(x).group(1).strip())
     ret_data = {}
 
-    ''' @一种数据结构 {'AA': [[x,y]]}, 注意AA+为'AA＋'
-        for item in data:
-        num_valid = []
-        for num_list in item['seriesData']:
-            if str(num_list[1]).strip() != 'None':
-                num_valid.append(num_list)
-        ret_data[pattern.search(item['ycDefName']).group(1)] = num_valid
-    '''
-    #另一种数据结构 {'AA':[x,y]}
     for item in data:
         X = []
         Y = []
         for num_list in item['seriesData']:
             if str(num_list[1]).strip() != 'None':
                 X.append(num_list[0])
-                Y.append(num_list[1])
+                Y.append(num_list[1]*0.01)
         temp = pattern.search(item['ycDefName']).group(1)
         key = temp if (temp[-1] != '＋') else (temp[:-1] + '+')
         ret_data[key] = [X, Y]

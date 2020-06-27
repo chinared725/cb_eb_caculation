@@ -7,17 +7,24 @@ import scipy.interpolate
 
 from bond_curve import get_curve
 
+
+'''
+@这个类用于取得债券的数据，网络爬虫集思录数据，链接出自以下几种地址，都可以
+'https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1593047862790'
+'https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1593047852448'
+ "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
+'''
+
+
 class CbEb:
 
     def __init__(self):
         self.url = "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
-        #self.url = 'https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1593047862790'
-        #self.url = 'https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1593047852448'
-        self.data = get_data(self.url)
+        self.data = data_remove_percent(get_data(self.url), ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
+        self.company_bond_return_curve = get_curve()  #导入企业债收益率曲线
 
     def get_bond_data(self, bond_type='cb'):
-
-        data = data_remove_percent(self.data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
+        data = self.data.copy()
         data['turnover_rate'] = data['turnover_rt'] * 0.01
         data['报价时间'] = data['price_tips'].apply(get_bond_time)
 
@@ -136,9 +143,9 @@ class CbEb:
                  '年化税前收益率']
         data = data[cols]
 
-        company_bond_return_curve = get_curve()  #导入企业债收益率曲线
+
         #通过企业债收益曲线，根据评级、年限来计算债券的收益率
-        data['债券收益率'] = data.apply(lambda x : scipy.interpolate.interp1d(company_bond_return_curve[x['评级']][0],company_bond_return_curve[x['评级']][1])(x['剩余年限']),axis=1)*0.01
+        data['债券收益率'] = data.apply(lambda x : scipy.interpolate.interp1d(self.company_bond_return_curve[x['评级']][0],self.company_bond_return_curve[x['评级']][1])(x['剩余年限']),axis=1)
         data['纯债价值'] = data.apply(lambda x : (x['转债价格']*(1+x['年化税前收益率'])**x['剩余年限'])/((1 + x['债券收益率'])**x['剩余年限']), axis=1)
 
         if bond_type.lower() == 'cb':
