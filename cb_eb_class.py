@@ -16,14 +16,13 @@ from baostock_api import BS_Api
  "https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900"
 '''
 
-
 class CbEb:
 
     def __init__(self):
         self.data = get_data('https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900')
-        self.company_bond_return_curve = get_curve()  #导入企业债收益率曲线
-        baostock_data = BS_Api()
-        self.data['正股波动率'] = self.data.apply(lambda x : np.std(baostock_data.get_daily_data(x['stock_id'])['pctChg']*0.01, ddof = 1)*(250**0.5),axis=1)
+        self.company_bond_return_curve = get_curve()  #导入国债和企业债收益率曲线
+        baostock_data = BS_Api() #初始化baostock类，用于计算方差
+        self.data['正股波动率'] = self.data.apply(lambda x : np.std(baostock_data.get_daily_data(x['stock_id'])['pctChg']*0.01, ddof = 1),axis=1)
         baostock_data.logout()
 
     def get_bond_data(self, bond_type='cb'):
