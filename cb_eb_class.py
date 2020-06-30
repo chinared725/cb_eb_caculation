@@ -19,12 +19,19 @@ from baostock_api import BS_Api
 
 class CbEb:
 
-    def __init__(self):
+    def __init__(self, daily_source='bs'):
         self.data = get_data('https://www.jisilu.cn/data/cbnew/cb_list/?___jsl=LST___t=1584777951900')
         self.company_bond_return_curve = get_curve()  #导入企业债收益率曲线
-        baostock_data = BS_Api()
-        self.data['正股波动率'] = self.data.apply(lambda x : np.std(baostock_data.get_daily_data(x['stock_id'])['pctChg']*0.01, ddof = 1)*(250**0.5),axis=1)
-        baostock_data.logout()
+        if daily_source == 'bs':
+            baostock_data = BS_Api()
+            self.data['正股波动率'] = self.data.apply(lambda x : np.std(baostock_data.get_daily_data(x['stock_id'])['pctChg']*0.01, ddof = 1)*(250**0.5),axis=1)
+            baostock_data.logout()
+            self.data['正股波动率'].to_csv('bond_std.txt')
+        elif daily_source == 'f':
+            self.data['正股波动率'] = pd.read_csv('bond_std.txt',header=None)[1]
+        else:
+            raise ValueError('波动率数据来源错误，请重新选择，"bs"代表来自baostock,"f"代表从文件获取')
+
 
     def get_bond_data(self, bond_type='cb'):
         data = self.data.copy()
