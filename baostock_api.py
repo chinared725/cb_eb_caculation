@@ -3,6 +3,10 @@ import pandas as pd
 import numpy as np
 import datetime
 
+'''
+@从baostock拉股票的数据
+
+'''
 
 
 class BS_Api:
