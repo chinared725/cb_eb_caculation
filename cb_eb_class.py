@@ -166,6 +166,7 @@ class CbEb:
         data['期权价值'] = data.apply(lambda x : get_bs_option_value(x['正股现价'], x['转股价'], x['剩余年限'], \
             scipy.interpolate.interp1d(self.company_bond_return_curve['国债即期'][0],self.company_bond_return_curve['国债即期'][1])(x['剩余年限']), \
             x['正股波动率']),axis=1)
+        data['理论价值'] = data.apply(lambda x : (x['纯债价值'] + x['期权价值']), axis=1)
         data['理论偏离度'] = data.apply(lambda x : (x['转债价格'] - (x['纯债价值'] + x['期权价值']))/(x['纯债价值'] + x['期权价值']), axis=1)
 
         if bond_type.lower() == 'cb':
