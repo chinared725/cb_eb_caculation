@@ -2,7 +2,8 @@ from cb_eb_class import CbEb
 import pandas as pd
 import numpy as np
 
-
+pd.set_option('display.unicode.ambiguous_as_wide', True)
+pd.set_option('display.unicode.east_asian_width', True)
 
 
 pd.set_option('display.max_columns',100)
@@ -28,6 +29,6 @@ if __name__ == '__main__':
 
     print('-------------------------------------------------------------------------------------------------------')
     print('\n你想了解的可转债可转债-----------------------------------------------------------------\n\n')
-    bond_names = ['长证转债','国君转债','浙商转债','华安转债','亚药转债','歌尔转2']
+    bond_names = ['长证转债','国君转债','浙商转债','华安转债']
     bond = cb_eb.get_bond_data_by_name(bond_names)
     print(bond)
