@@ -9,9 +9,9 @@ pd.set_option('display.unicode.east_asian_width', True)
 pd.set_option('display.max_columns',100)
 
 bond_type = 'cb'
-bond_price = 130
-premium_rate = 0.08
-pb = 0
+bond_price = 120
+premium_rate = 0.2
+pb = 1
 
 if __name__ == '__main__':
     cb_eb = CbEb(daily_source='f')    #类初始化
@@ -34,6 +34,3 @@ if __name__ == '__main__':
     bond_names = ['长证转债','国君转债','浙商转债','华安转债']
     bond = cb_eb.get_bond_data_by_name(bond_names)
     print(bond)
-
-
-    print(cb_eb.data)
