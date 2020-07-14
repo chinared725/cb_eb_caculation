@@ -38,8 +38,6 @@ class CbEb:
         data = data_remove_percent(data, ['convert_amt_ratio', 'premium_rt', 'sincrease_rt', 'ytm_rt', 'ytm_rt_tax', 'increase_rt'])
         data['turnover_rate'] = data['turnover_rt'] * 0.01
         data['报价时间'] = data['price_tips'].apply(get_bond_time)
-
-
         data.drop(['adjust_tip',
                    'adjusted',
                    'apply_cd',
@@ -156,9 +154,8 @@ class CbEb:
                  '税前收益率',
                  '正股波动率']
         data = data[cols_2]
-
-
         #通过企业债收益曲线，根据评级、年限来计算债券的收益率
+        data['评级'] = data['评级'].map(lambda x : x.strip())
         data['债券收益率'] = data.apply(lambda x : scipy.interpolate.interp1d(self.company_bond_return_curve[x['评级']][0],self.company_bond_return_curve[x['评级']][1])(x['剩余年限']),axis=1)
         data['纯债价值'] = data.apply(lambda x : (x['转债价格']*(1+x['税前收益率'])**x['剩余年限'])/((1 + x['债券收益率'])**x['剩余年限']), axis=1)
         data['纯债价值比例'] = data.apply(lambda x : x['纯债价值']/x['转债价格'], axis=1)
@@ -168,6 +165,7 @@ class CbEb:
             x['正股波动率']),axis=1)
         data['理论价值'] = data.apply(lambda x : (x['纯债价值'] + x['期权价值']), axis=1)
         data['理论偏离度'] = data.apply(lambda x : (x['转债价格'] - (x['纯债价值'] + x['期权价值']))/(x['纯债价值'] + x['期权价值']), axis=1)
+
 
         if bond_type.lower() == 'cb':
             cb = data[data['转债名称'].apply(lambda x : 'EB' not in x)].copy()
