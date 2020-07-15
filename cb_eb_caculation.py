@@ -10,7 +10,7 @@ pd.set_option('display.max_rows',1000)
 
 bond_type = 'cb'
 bond_price = 115
-premium_rate = 0.2
+premium_rate = 0.15
 pb = 1
 
 if __name__ == '__main__':
