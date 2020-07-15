@@ -10,7 +10,11 @@ pd.set_option('display.max_columns',100)
 
 bond_type = 'cb'
 bond_price = 120
+<<<<<<< HEAD
 premium_rate = 0.15
+=======
+premium_rate = 0.2
+>>>>>>> parent of 9a4cfc7... update
 pb = 1
 
 if __name__ == '__main__':
