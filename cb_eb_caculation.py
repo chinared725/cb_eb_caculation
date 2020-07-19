@@ -16,6 +16,8 @@ premium_rate = 0.15
 =======
 =======
 >>>>>>> parent of 9a4cfc7... update
+=======
+>>>>>>> parent of 9a4cfc7... update
 premium_rate = 0.2
 >>>>>>> parent of 9a4cfc7... update
 pb = 1
