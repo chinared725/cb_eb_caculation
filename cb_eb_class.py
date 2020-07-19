@@ -159,6 +159,7 @@ class CbEb:
 
 
         #通过企业债收益曲线，根据评级、年限来计算债券的收益率
+        data['评级'] = data['评级'].map(lambda x : x.strip())
         data['债券收益率'] = data.apply(lambda x : scipy.interpolate.interp1d(self.company_bond_return_curve[x['评级']][0],self.company_bond_return_curve[x['评级']][1])(x['剩余年限']),axis=1)
         data['纯债价值'] = data.apply(lambda x : (x['转债价格']*(1+x['税前收益率'])**x['剩余年限'])/((1 + x['债券收益率'])**x['剩余年限']), axis=1)
         data['纯债价值比例'] = data.apply(lambda x : x['纯债价值']/x['转债价格'], axis=1)

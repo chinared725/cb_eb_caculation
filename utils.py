@@ -6,7 +6,8 @@ import numpy as np
 def data_remove_percent(data, columns):  #remove '%' symble in columne
     for col in columns:
         data[col] = data[col].apply(lambda x : x[:-1])
-        data[col] = data[col].apply(pd.to_numeric, errors = 'ignore')*0.01
+        data[col] = data[col].apply(pd.to_numeric, errors = 'ignore')
+        data[col] = data[col].apply(lambda x : x*0.01 if isinstance(x, float) else 0)
     return data.apply(pd.to_numeric, errors = 'ignore')
 
 
