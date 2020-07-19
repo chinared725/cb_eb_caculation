@@ -12,6 +12,7 @@ bond_type = 'cb'
 bond_price = 120
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 premium_rate = 0.15
 =======
 =======
