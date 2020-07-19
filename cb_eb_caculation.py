@@ -13,8 +13,11 @@ bond_price = 120
 <<<<<<< HEAD
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 premium_rate = 0.15
 =======
+=======
+>>>>>>> parent of 9a4cfc7... update
 =======
 >>>>>>> parent of 9a4cfc7... update
 =======
