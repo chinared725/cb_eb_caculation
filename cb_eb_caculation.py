@@ -9,9 +9,9 @@ pd.set_option('display.unicode.east_asian_width', True)
 pd.set_option('display.max_columns',100)
 
 bond_type = 'cb'
-bond_price = 120
+bond_price = 115
 
-premium_rate = 0.25
+premium_rate = 0.15
 
 pb = 1
 
@@ -34,6 +34,6 @@ if __name__ == '__main__':
 
     print('-------------------------------------------------------------------------------------------------------')
     print('\n你想了解的可转债可转债-----------------------------------------------------------------\n\n')
-    bond_names = ['长证转债','国君转债','浙商转债','华安转债','顺昌转债','盛屯转债','本钢转债']
+    bond_names = ['钧达转债','永鼎转债','国城转债','城地转债','科华转债']
     bond = cb_eb.get_bond_data_by_name(bond_names)
     print(bond)
