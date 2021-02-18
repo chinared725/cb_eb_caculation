@@ -9,7 +9,7 @@ pd.set_option('display.unicode.east_asian_width', True)
 pd.set_option('display.max_columns',100)
 
 bond_type = 'cb'
-bond_price = 115
+bond_price = 98
 
 premium_rate = 0.15
 

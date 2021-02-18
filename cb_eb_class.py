@@ -39,7 +39,6 @@ class CbEb:
         data['turnover_rate'] = data['turnover_rt'] * 0.01
         data['报价时间'] = data['price_tips'].apply(get_bond_time)
 
-
         data.drop(['adjust_tip',
                    'adjusted',
                    'apply_cd',
@@ -47,10 +46,8 @@ class CbEb:
                    'last_time',
                    'left_put_year',
                    'margin_flg',
-                   'noted',
                    'online_offline_ratio',
                    'option_tip',
-                   'owned',
                    'bond_id',
                    'put_notes',
                    'qflag',
@@ -75,7 +72,7 @@ class CbEb:
                    'repo_valid_to',
                    'ration_cd',
                    'turnover_rt'], axis=1, inplace=True)
-
+#'owned',  'noted',
         cols_1 = {'adj_cnt':'下调次数',
                 'adj_scnt':'下调成功次数',
                 'convert_cd':'转债占比',
