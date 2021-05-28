@@ -199,6 +199,16 @@ class CbEb:
         #     double_low[['溢价率','正股涨幅', '转债涨幅','债券收益率','换手率','税前收益率','税后收益率','债券收益率','纯债价值比例','正股波动率','理论偏离度']].apply(rate_add_percent, axis=1)
         return double_low
 
+    def get_double_low_bond_by_value(self, bond_type='cb', bond_price=105, double_low_value=160):
+        if bond_type.lower() == 'cb':
+            data = self.get_bond_data(bond_type = 'cb')
+        elif bond_type.lower() == 'eb':
+            data = self.get_bond_data(bond_type = 'eb')
+        else:
+            raise ValueError('错误的债券类型')
+
+        double_low_bond_by_value = data[(data['双低']<=double_low_value)&(data['转债价格']<bond_price)]
+        return double_low_bond_by_value
 
     def get_bond_not_list(self, bond_type='cb'):
         cols = ['转债代码',
